@@ -1,4 +1,4 @@
-ng = angular.module 'client', ['viewport']
+ng = angular.module 'client', ['viewport', 'socket', 'topology']
 
 ng.config ($routeProvider) -> 
 
@@ -12,17 +12,28 @@ ng.config ($routeProvider) ->
         redirectTo: '/'
 
 
-ClientController = ($log, actorService) ->
+ClientController = ($log, actorService, socketService, topologyService) ->
 
-    $log.info 'init ClientController' 
+    $log.info 'init ClientController'
 
-    
+
+    socketService.register
+
+        label: 'me', (err, payload) -> 
+
+            topologyService.init
+
+                lat: '18.49963'
+                long: '-34.36157'
+                alt: '100'
+                
     #
     # create wireframe reference plane 
     #
 
     geometry = new THREE.PlaneGeometry 2000, 2000, 40, 40
     material = new THREE.MeshBasicMaterial color: 0x000000, wireframe: true
+
     #
     # plane was generated on XY, rotate to XZ
     #

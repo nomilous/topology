@@ -32,13 +32,13 @@ module.exports =
             res.render 'client'
 
 
-        server = http.createServer app
-        socket = io.listen server
+        server  = http.createServer app
+        sockets = io.listen server
 
         new TopologyServer
    
             app: app
-            socket: socket
+            sockets: sockets
             
 
         server.listen port, host, -> 

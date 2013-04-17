@@ -1,0 +1,11 @@
+#!/usr/bin/env coffee
+
+require('nez').objective 'topology',
+
+    category: 'Web Application'
+
+    description: """
+
+    stream just-in-time topology data to the browser
+
+    """, (requirement) -> 

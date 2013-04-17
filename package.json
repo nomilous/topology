@@ -1,0 +1,18 @@
+{
+  "name": "topology",
+  "private": true,
+  "description": "topology server",
+  "version": "0.0.0",
+  "dependencies": {
+    "express": "~3.1.1",
+    "jade": "~0.28.2",
+    "connect-assets": "~2.4.1",
+    "coffee-script": "~1.6.2",
+    "stylus": "~0.32.1",
+    "request": "~2.16.6"
+  },
+  "devDependencies": {
+    "nez": "0.0.7",
+    "should": "~1.2.2"
+  }
+}

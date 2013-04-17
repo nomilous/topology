@@ -22,6 +22,11 @@ module.exports =
             res.render 'index'
 
 
+        app.get '/client.html', (req, res) -> 
+
+            res.render 'client'
+
+
         http.createServer( app ).listen 3000, -> 
 
             console.log 'http://localhost:3000'

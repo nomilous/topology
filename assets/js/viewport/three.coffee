@@ -3,7 +3,7 @@ ng = angular.module 'viewport', [], ($provide) ->
 
 SceneService = ($log) -> 
 
-    scene = _scene =
+    scene = 
 
         scene: new THREE.Scene()
 
@@ -31,7 +31,7 @@ ActorService = ($log, sceneService) ->
 
     actors = {}
 
-    service = _service = 
+    service =
 
         init: (elem, attrs) -> 
 
@@ -47,7 +47,7 @@ ActorService = ($log, sceneService) ->
 
 FirstPersonService = ($log, sceneService) -> 
 
-    firstPerson = _firstPerson =
+    firstPerson = 
 
         init: (elem, attrs) -> 
 
@@ -84,7 +84,7 @@ FirstPersonService = ($log, sceneService) ->
 
 AnimateService = ($log, sceneService, firstPersonService) -> 
 
-    animate = _animate = 
+    animate = 
 
         init: (elem, attrs) -> 
 

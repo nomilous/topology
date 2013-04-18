@@ -31,7 +31,7 @@ ng.directive 'infoPanel', ($log, firstPersonService, animateService) ->
             """
 
 
-ClientController = ($log, actorService, socketService, topologyService) ->
+ClientController = ($log, actorService, socketService, topologyService, firstPersonService) ->
 
     socketService.register
 
@@ -39,11 +39,48 @@ ClientController = ($log, actorService, socketService, topologyService) ->
 
             $log.info 'register config', config
 
-    topologyService.register
+    #
+    # viewport vector unit as 1 meter
+    #
+    # 
+    # North +z
+    # West  +x
+    # South -z
+    # East  -x
+    # Up    +y
+    # Down  -y
+    #
+
+    topologyService.register {
+
+        #
+        # active grid of elevation samples 
+        # as 360 x 360 square with firstperson
+        # at center
+        #
+
+        width: 360 
+
+        #
+        # first person position on geoid
+        # 
+        # topology register response will contain 
+        # the 360 x 360 samples that surround this
+        # position
+        #
 
         long: '18.49963'
         lat: '-34.36157'
-        alt: '100', (err, config) -> 
+
+
+        #
+        # first person altitude above geoid (not above ground level)
+        # 
+
+        alt: firstPersonService.camera.position.y
+
+
+    }, (err, config) -> 
 
             $log.info 'topology config', config
                 
@@ -54,14 +91,6 @@ ClientController = ($log, actorService, socketService, topologyService) ->
     geometry = new THREE.PlaneGeometry 2000, 2000, 40, 40
     material = new THREE.MeshBasicMaterial color: 0x000000, wireframe: true
 
-    # 
-    # North +z
-    # West  +x
-    # South -z
-    # East  -x
-    # Up    +y
-    # Down  -y
-    #
 
     #
     # plane was generated on XY with 0:0 at -X+Y

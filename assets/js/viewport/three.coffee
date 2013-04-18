@@ -67,7 +67,7 @@ FirstPersonService = ($log, sceneService) ->
             # camera orientation defaults to looking into +x 
             #
 
-            firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera, elem[0] );
+            firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera );
 
             #
             # TODO: followinf configurables as attrs in the <three-viewport> directive
@@ -88,32 +88,33 @@ AnimateService = ($log, sceneService, firstPersonService) ->
 
     events =
 
-        refresh: []
+        'before:animate': []
+        'after:animate': []
     
 
     animate = 
 
         init: (elem, attrs) -> 
 
-        update: -> 
-
         on: (event, callback) -> 
 
-            events[event] ||= []
-            events[event].push callback
+            try
+                events[event].push callback
 
-        animate: (updateFn) -> 
-
-            animate.update = updateFn if updateFn
+            catch error
+                $log.error 'AnimateService.on("%s"): NO SUCH EVENT', event
 
         loop: -> 
 
-            animate.update()
+            for callback in events['before:animate']
+
+                callback()
+
             firstPersonService.controls.update firstPersonService.clock.getDelta()
             requestAnimationFrame animate.loop
             sceneService.renderer.render sceneService.scene, firstPersonService.camera
 
-            for callback in events['refresh']
+            for callback in events['after:animate']
 
                 callback()
             
@@ -136,26 +137,6 @@ ng.directive 'threeFirstPerson', ($log, firstPersonService) ->
         firstPersonService.camera.position.y = parseInt attrs.modelPositionY || 0
         firstPersonService.camera.position.z = parseInt attrs.modelPositionZ || 0
 
-
-ng.directive 'infoPanel', ($log, firstPersonService, animateService) -> 
-    
-    restrict: 'E'
-
-    compile: (elem, attrs) -> 
-
-        $log.info 'compile threeLocationPanel', attrs
-
-        position = firstPersonService.camera.position
-
-        animateService.on 'refresh', -> 
-
-            elem[0].innerHTML = """
-            
-                x: #{Math.round(position.x * 100) / 100} <br />
-                y: #{Math.round(position.y * 100) / 100} <br />
-                z: #{Math.round(position.z * 100) / 100} <br />
-
-            """
 
 
 ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonService, animateService) -> 

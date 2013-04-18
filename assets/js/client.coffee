@@ -12,6 +12,27 @@ ng.config ($routeProvider) ->
         redirectTo: '/'
 
 
+ng.directive 'infoPanel', ($log, firstPersonService, animateService) -> 
+    
+    restrict: 'E'
+
+    compile: (elem, attrs) -> 
+
+        $log.info 'compile threeLocationPanel', attrs
+
+        position = firstPersonService.camera.position
+
+        animateService.on 'after:animate', -> 
+
+            elem[0].innerHTML = """
+
+                x: #{Math.round(position.x * 100) / 100} <br />
+                y: #{Math.round(position.y * 100) / 100} <br />
+                z: #{Math.round(position.z * 100) / 100} <br />
+
+            """
+
+
 ClientController = ($log, actorService, socketService, topologyService) ->
 
     $log.info 'init ClientController'

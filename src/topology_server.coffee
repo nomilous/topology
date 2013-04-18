@@ -1,3 +1,5 @@
+TileCache = require './tile_cache' 
+
 class TopologyServer
 
     constructor: (properties) -> 
@@ -8,6 +10,7 @@ class TopologyServer
 
         throw 'missing app' unless @app
         throw 'missing sockets' unless @sockets
+        throw 'missing cache' unless @cache
 
         @sockets.on 'connection', (socket) => 
 
@@ -74,7 +77,7 @@ class TopologyServer
     loadTile: (id) -> 
 
         console.log '\n\nload tile:', id
-        
+
 
 
 module.exports = TopologyServer

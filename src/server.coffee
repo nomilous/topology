@@ -3,6 +3,7 @@ assets         = require 'connect-assets'
 express        = require 'express'
 io             = require 'socket.io'
 TopologyServer = require './topology_server'
+TileCache      = require './tile_cache'
 
 host           = 'localhost'
 port           = 3000
@@ -39,6 +40,12 @@ module.exports =
    
             app: app
             sockets: sockets
+            cache: new TileCache 
+
+                type: 'GeoTiff'
+                path: root + '/tiles'
+                prefix: 'ASTGTM2_'
+                suffix: '_dem.tif'
             
 
         server.listen port, host, -> 

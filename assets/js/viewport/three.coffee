@@ -63,7 +63,9 @@ FirstPersonService = ($log, sceneService) ->
 
             firstPerson.camera = new THREE[type] fov, aspect, near, far
 
-            firstPerson.camera.position.y = 20
+            #
+            # camera orientation defaults to looking into +x 
+            #
 
             firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera, elem[0] );
 
@@ -102,11 +104,26 @@ AnimateService = ($log, sceneService, firstPersonService) ->
             sceneService.renderer.render sceneService.scene, firstPersonService.camera
             
 
-
 ng.factory 'sceneService',       SceneService
 ng.factory 'actorService',       ActorService
 ng.factory 'firstPersonService', FirstPersonService
 ng.factory 'animateService',     AnimateService
+
+
+ng.directive 'threeFirstPerson', ($log, firstPersonService) -> 
+    
+    restrict: 'E'
+
+    compile: (elem, attrs) -> 
+
+        $log.info 'compile threeFirstPerson', attrs
+
+        firstPersonService.camera.position.x = parseInt attrs.modelPositionX || 0
+        firstPersonService.camera.position.y = parseInt attrs.modelPositionY || 0
+        firstPersonService.camera.position.z = parseInt attrs.modelPositionZ || 0
+
+
+
 
 
 ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonService, animateService) -> 

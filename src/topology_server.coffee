@@ -71,4 +71,10 @@ class TopologyServer
         @loadTile tileID
 
 
+    loadTile: (id) -> 
+
+        console.log '\n\nload tile:', id
+        
+
+
 module.exports = TopologyServer

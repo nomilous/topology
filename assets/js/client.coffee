@@ -23,8 +23,8 @@ ClientController = ($log, actorService, socketService, topologyService) ->
 
             topologyService.init
 
-                lat: '18.49963'
-                long: '-34.36157'
+                long: '18.49963'
+                lat: '-34.36157'
                 alt: '100'
                 
     #

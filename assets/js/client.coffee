@@ -16,7 +16,6 @@ ClientController = ($log, actorService, socketService, topologyService) ->
 
     $log.info 'init ClientController'
 
-
     socketService.register
 
         label: 'me', (err, payload) -> 
@@ -65,3 +64,5 @@ ClientController = ($log, actorService, socketService, topologyService) ->
 
         _id: 'topology'
         object: new THREE.Mesh geometry, material
+
+        

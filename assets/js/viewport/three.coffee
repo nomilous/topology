@@ -86,11 +86,21 @@ FirstPersonService = ($log, sceneService) ->
 
 AnimateService = ($log, sceneService, firstPersonService) -> 
 
+    events =
+
+        refresh: []
+    
+
     animate = 
 
         init: (elem, attrs) -> 
 
         update: -> 
+
+        on: (event, callback) -> 
+
+            events[event] ||= []
+            events[event].push callback
 
         animate: (updateFn) -> 
 
@@ -102,6 +112,10 @@ AnimateService = ($log, sceneService, firstPersonService) ->
             firstPersonService.controls.update firstPersonService.clock.getDelta()
             requestAnimationFrame animate.loop
             sceneService.renderer.render sceneService.scene, firstPersonService.camera
+
+            for callback in events['refresh']
+
+                callback()
             
 
 ng.factory 'sceneService',       SceneService
@@ -123,7 +137,25 @@ ng.directive 'threeFirstPerson', ($log, firstPersonService) ->
         firstPersonService.camera.position.z = parseInt attrs.modelPositionZ || 0
 
 
+ng.directive 'infoPanel', ($log, firstPersonService, animateService) -> 
+    
+    restrict: 'E'
 
+    compile: (elem, attrs) -> 
+
+        $log.info 'compile threeLocationPanel', attrs
+
+        position = firstPersonService.camera.position
+
+        animateService.on 'refresh', -> 
+
+            elem[0].innerHTML = """
+            
+                x: #{Math.round(position.x * 100) / 100} <br />
+                y: #{Math.round(position.y * 100) / 100} <br />
+                z: #{Math.round(position.z * 100) / 100} <br />
+
+            """
 
 
 ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonService, animateService) -> 

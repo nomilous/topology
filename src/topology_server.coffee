@@ -47,12 +47,12 @@ class TopologyServer
 
         else
 
-            latVal = Math.ciel lat
+            latVal = Math.ceil lat
             latDir = 'N'
 
         if long < 0
 
-            longVal = Math.ciel( - long )
+            longVal = Math.ceil( - long )
             longDir = 'W'
 
         else 

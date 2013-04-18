@@ -28,12 +28,16 @@ class TileCache
             # alreaady got tile
             #
 
+            console.log 'cached tile "%s"', id
+
             callback null, @tiles[id]
             return
 
+        console.log 'load tile "%s" from file', id
+
         file = @path + '/' + @prefix + id + @suffix
 
-        new GeoTiff( file ).loadFile (err, tile) -> 
+        new GeoTiff( file ).loadFile (err, tile) => 
 
             if err
 

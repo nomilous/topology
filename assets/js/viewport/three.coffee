@@ -131,8 +131,6 @@ ng.directive 'threeFirstPerson', ($log, firstPersonService) ->
 
     compile: (elem, attrs) -> 
 
-        $log.info 'compile threeFirstPerson', attrs
-
         firstPersonService.camera.position.x = parseInt attrs.modelPositionX || 0
         firstPersonService.camera.position.y = parseInt attrs.modelPositionY || 0
         firstPersonService.camera.position.z = parseInt attrs.modelPositionZ || 0
@@ -144,8 +142,6 @@ ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonServ
     restrict: 'E'
 
     compile: (elem, attrs) -> 
-
-        $log.info 'compile threeViewport'
 
         sceneService.init elem, attrs
         actorService.init elem, attrs

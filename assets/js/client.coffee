@@ -18,8 +18,6 @@ ng.directive 'infoPanel', ($log, firstPersonService, animateService) ->
 
     compile: (elem, attrs) -> 
 
-        $log.info 'compile threeLocationPanel', attrs
-
         position = firstPersonService.camera.position
 
         animateService.on 'after:animate', -> 
@@ -35,17 +33,19 @@ ng.directive 'infoPanel', ($log, firstPersonService, animateService) ->
 
 ClientController = ($log, actorService, socketService, topologyService) ->
 
-    $log.info 'init ClientController'
-
     socketService.register
 
-        label: 'me', (err, payload) -> 
+        label: 'me', (err, config) -> 
 
-            topologyService.init
+            $log.info 'register config', config
 
-                long: '18.49963'
-                lat: '-34.36157'
-                alt: '100'
+    topologyService.register
+
+        long: '18.49963'
+        lat: '-34.36157'
+        alt: '100', (err, config) -> 
+
+            $log.info 'topology config', config
                 
     #
     # create wireframe reference plane 
@@ -77,8 +77,7 @@ ClientController = ($log, actorService, socketService, topologyService) ->
     # raise corner at 0:0 to confirm NORTH WEST
     #
 
-    geometry.vertices[0].y = 100  # 
-    console.log geometry.vertices[0]
+    geometry.vertices[0].y = 100
 
 
     actorService.add

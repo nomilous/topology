@@ -25,23 +25,23 @@ class TopologyServer
                 socket.emit 'person:register:ok', person
 
 
-            socket.on 'topology:start_at', (payload) => 
+            socket.on 'topology:register', (payload) => 
 
                 @startAt 
 
                     socket: socket
-                    payload: payload
+                    payload: payload, (err, config) -> 
+
+                        socket.emit 'topology:register:ack', config
 
 
-    startAt: (params) ->
+    startAt: (params, callback) ->
 
         throw 'missing socket' unless params.socket
         throw 'missing payload' unless params.payload
 
         lat  = params.payload.lat
         long = params.payload.long
-
-
 
         if lat < 0
 
@@ -71,12 +71,21 @@ class TopologyServer
 
         tileID = latDir + latVal + longDir + longVal
 
-        @loadTile tileID
+        @loadTile tileID, (err, tile) -> 
+
+            if err
+
+                callback err
+                return
+
+            callback null, pixelScale: tile.pixelScale
 
 
-    loadTile: (id) -> 
+    loadTile: (id, callback) -> 
 
-        console.log '\n\nload tile:', id
+        console.log 'TODO: multiple concurrent clients on requesting the same uncached tile cause a simultanoues load from disk'
+
+        @cache.loadTile id, callback
 
 
 

@@ -1,4 +1,4 @@
-require('nez').realize 'TopologyServer', (TopologyServer, test, context) -> 
+require('nez').realize 'TopologyServer', (TopologyServer, test, context, TileCache) -> 
 
     context 'startAt()', (it) ->
 
@@ -6,7 +6,13 @@ require('nez').realize 'TopologyServer', (TopologyServer, test, context) ->
 
             topo = new TopologyServer
 
+                cache: new TileCache
+
+                    type: 'GeoTiff'
+                    path: '/path'
+
                 app: {}
+
                 sockets: on: (event, callback) -> 
 
                     if event == 'connection'
@@ -24,7 +30,7 @@ require('nez').realize 'TopologyServer', (TopologyServer, test, context) ->
             emit: ->
             on: (event, callback) -> 
 
-                if event == 'topology:start_at'
+                if event == 'topology:register'
 
                     #
                     # receive subscribe to 'topology:start_at'

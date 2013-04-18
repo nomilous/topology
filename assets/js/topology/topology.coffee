@@ -4,9 +4,13 @@ TopologyService = ($log, socketService) ->
 
     service = 
 
-        init: (opts) -> 
+        register: (opts, callback) -> 
 
-            socketService.socket.emit 'topology:start_at', opts
+            socketService.socket.emit 'topology:register', opts
+
+            socketService.socket.on 'topology:register:ack', (config) ->
+
+                callback null, config
             
 
 ng.factory 'topologyService', TopologyService

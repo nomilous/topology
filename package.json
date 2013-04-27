@@ -10,7 +10,8 @@
     "coffee-script": "~1.6.2",
     "stylus": "~0.32.1",
     "request": "~2.16.6",
-    "socket.io": "~0.9.14"
+    "socket.io": "~0.9.14",
+    "node-shapelib-partial": "0.0.1"
   },
   "devDependencies": {
     "nez": "0.0.7",

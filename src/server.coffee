@@ -4,6 +4,8 @@ express        = require 'express'
 io             = require 'socket.io'
 TopologyServer = require './topology_server'
 TileCache      = require './tile_cache'
+ShapeServer    = require './shape_server'
+ShapeCache     = require './shape_cache'
 
 host           = 'localhost'
 port           = 3000
@@ -46,6 +48,14 @@ module.exports =
                 path: root + '/tiles'
                 prefix: 'ASTGTM2_'
                 suffix: '_dem.tif'
+
+        new ShapeServer
+
+            app: app
+            sockets: sockets
+            cache: new ShapeCache
+
+                path: root + '/shapes'
             
 
         server.listen port, host, -> 

@@ -1,5 +1,3 @@
-TileCache = require './tile_cache' 
-
 class TopologyServer
 
     constructor: (properties) -> 

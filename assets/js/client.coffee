@@ -1,4 +1,4 @@
-ng = angular.module 'client', ['viewport', 'socket', 'topology']
+ng = angular.module 'client', ['viewport', 'socket', 'topology', 'shape']
 
 ng.config ($routeProvider) -> 
 
@@ -31,7 +31,7 @@ ng.directive 'infoPanel', ($log, firstPersonService, animateService) ->
             """
 
 
-ClientController = ($log, actorService, socketService, topologyService, firstPersonService) ->
+ClientController = ($log, actorService, socketService, topologyService, shapeService, firstPersonService) ->
 
     socketService.register
 
@@ -82,11 +82,21 @@ ClientController = ($log, actorService, socketService, topologyService, firstPer
 
     }, (err, config) -> 
 
-            $log.info 'topology config', config
+        $log.info 'topology config', config
                 
     #
     # create wireframe reference plane 
     #
+
+    shapeService.register {
+
+        id: 'ne_110m_land'
+
+    }, (err, shapes) ->
+
+        $log.info 'shapes', shapes
+
+
 
     geometry = new THREE.PlaneGeometry 2000, 2000, 40, 40
     material = new THREE.MeshBasicMaterial color: 0x000000, wireframe: true

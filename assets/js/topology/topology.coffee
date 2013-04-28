@@ -1,6 +1,10 @@
 ng = angular.module 'topology', ['socket']
 
 TopologyService = ($log, socketService) -> 
+    
+    radius = 200
+    #radius = 6371000  # earth radius in meters (approx)
+    radianRatio = Math.PI / 180
 
     service = 
 
@@ -33,6 +37,19 @@ TopologyService = ($log, socketService) ->
                 # to the edge (and remove the row on the oposite edge)
                 # 
 
-            
+
+        transform: (longitude, latitude, altitude) -> 
+
+            #
+            # position vector at gps 0,0 as +Z and rotate for lat/long
+            #
+
+            vector = new THREE.Vector3 0.0, 0.0, altitude + radius
+            matrix = new THREE.Matrix4
+            matrix.rotateY longitude * radianRatio
+            matrix.rotateX -latitude * radianRatio
+            vector.applyMatrix4 matrix
+            return vector
+
 
 ng.factory 'topologyService', TopologyService

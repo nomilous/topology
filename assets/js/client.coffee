@@ -84,22 +84,46 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
 
         $log.info 'topology config', config
                 
-    #
-    # create wireframe reference plane 
-    #
+
 
     shapeService.register {
 
         id: 'ne_110m_land'
 
-    }, (err, shapes) ->
+    }, (error, shapeData) ->
 
-        $log.info 'shapes', shapes
+        return if error
 
+        for i in [0..shapeData.count - 1]
 
+            material = new THREE.LineBasicMaterial color: 0x000000
+            geometry = new THREE.Geometry
 
-    geometry = new THREE.PlaneGeometry 2000, 2000, 40, 40
-    material = new THREE.MeshBasicMaterial color: 0x000000, wireframe: true
+            vertices = shapeData.shapes[i].vertices
+
+            for j in [0..vertices.length - 1]
+
+                longitude = vertices[j][0]
+                latitude  = vertices[j][1]
+                altitude  = 0
+
+                geometry.vertices.push topologyService.transform longitude, latitude, altitude
+
+            line = new THREE.Line geometry, material
+            
+            actorService.add
+
+                _id: 'ne_110m_land:' + i
+                object: line
+
+        return
+
+    #
+    # create wireframe reference plane 
+    #
+
+    # geometry = new THREE.PlaneGeometry 2000, 2000, 40, 40
+    # material = new THREE.MeshBasicMaterial color: 0x000000, wireframe: true
 
 
     #
@@ -108,20 +132,20 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
     # rotate 90 degrees about Y to set 0:0 to +X+Z as NorthWest corner
     # 
 
-    matrix = new THREE.Matrix4
-    geometry.applyMatrix matrix.makeRotationX( Math.PI / 2 )
-    geometry.applyMatrix matrix.makeRotationY( Math.PI / 2 )
+    # matrix = new THREE.Matrix4
+    # geometry.applyMatrix matrix.makeRotationX( Math.PI / 2 )
+    # geometry.applyMatrix matrix.makeRotationY( Math.PI / 2 )
 
     #
     # raise corner at 0:0 to confirm NORTH WEST
     #
 
-    geometry.vertices[0].y = 100
+    # geometry.vertices[0].y = 100
 
 
-    actorService.add
+    # actorService.add
 
-        _id: 'topology'
-        object: new THREE.Mesh geometry, material
+    #     _id: 'topology'
+    #     object: new THREE.Mesh geometry, material
 
         

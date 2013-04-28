@@ -1,5 +1,4 @@
-ng = angular.module 'viewport', [], ($provide) -> 
-
+ng = angular.module 'viewport', [] 
 
 SceneService = ($log) -> 
 

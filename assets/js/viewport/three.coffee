@@ -1,4 +1,4 @@
-ng = angular.module 'viewport', [] 
+ng = angular.module 'viewport', ['topology'] 
 
 SceneService = ($log) -> 
 
@@ -125,15 +125,22 @@ ng.factory 'firstPersonService', FirstPersonService
 ng.factory 'animateService',     AnimateService
 
 
-ng.directive 'threeFirstPerson', ($log, firstPersonService) -> 
+ng.directive 'threeFirstPerson', ($log, firstPersonService, topologyService) -> 
     
     restrict: 'E'
 
     compile: (elem, attrs) -> 
 
-        firstPersonService.camera.position.x = parseInt attrs.modelPositionX || 0
-        firstPersonService.camera.position.y = parseInt attrs.modelPositionY || 0
-        firstPersonService.camera.position.z = parseInt attrs.modelPositionZ || 0
+        firstPersonService.longitude = parseFloat attrs.longitude
+        firstPersonService.latitude  = parseFloat attrs.latitude
+        firstPersonService.altitude  = parseFloat attrs.altitude
+
+        vertex = topologyService.transform firstPersonService.longitude, 
+            firstPersonService.latitude, firstPersonService.altitude
+
+        firstPersonService.camera.position.x = vertex.x
+        firstPersonService.camera.position.y = vertex.y
+        firstPersonService.camera.position.z = vertex.z
 
 
 

@@ -69,15 +69,15 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
         # position
         #
 
-        long: '18.49963'
-        lat: '-34.36157'
+        long: firstPersonService.longitude
+        lat: firstPersonService.latitude
 
 
         #
         # first person altitude above geoid (not above ground level)
         # 
 
-        alt: firstPersonService.camera.position.y
+        alt: firstPersonService.altitude
 
 
     }, (err, config) -> 

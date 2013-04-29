@@ -66,7 +66,8 @@ FirstPersonService = ($log, sceneService) ->
             # camera orientation defaults to looking into +x 
             #
 
-            firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera, elem[0] );
+            #firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera, elem[0] );
+            firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera );
 
             #
             # TODO: followinf configurables as attrs in the <three-viewport> directive

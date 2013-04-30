@@ -18,6 +18,8 @@ SceneService = ($log) ->
             scene.renderer = new THREE[type]()
             scene.renderer.setSize elem[0].clientWidth, elem[0].clientHeight
 
+            scene.scene.fog = new THREE.FogExp2 0x202020, 0.0025
+
             elem[0].appendChild scene.renderer.domElement
 
 

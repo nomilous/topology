@@ -88,7 +88,7 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
 
     shapeService.register {
 
-        id: 'ne_110m_land'
+        id: 'ne_50m_land'
 
     }, (error, shapeData) ->
 
@@ -96,7 +96,7 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
 
         for i in [0..shapeData.count - 1]
 
-            material = new THREE.LineBasicMaterial color: 0x000000
+            material = new THREE.LineBasicMaterial color: 0x777777, linewidth: 1
             geometry = new THREE.Geometry
 
             vertices = shapeData.shapes[i].vertices

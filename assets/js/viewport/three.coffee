@@ -45,35 +45,8 @@ ActorService = ($log, sceneService) ->
 
             return actors[id]
 
-ControlService = ($log) -> 
 
-    service = 
-
-        init: (elem, attrs) -> 
-
-            document.addEventListener('mousemove', service.onMouseMove, false);
-            document.addEventListener('keydown', service.onKeyDown, false);
-            document.addEventListener('keyup', service.onKeyUp, false);
-
-        onMouseMove: (event) -> 
-
-            return unless pointerLocked
-            dx = event.movementX || event.mozMovementX || event.webkitMovementX || 0
-            dy = event.movementY || event.mozMovementY || event.webkitMovementY || 0
-            console.log dx, dy
-            
-        onKeyDown: (event) ->
-
-            return unless pointerLocked
-            console.log 'press', event.keyCode
-
-        onKeyUp: (event) ->
-
-            return unless pointerLocked
-            console.log 'release', event.keyCode
-
-
-FirstPersonService = ($log, sceneService, controlService) -> 
+FirstPersonService = ($log, sceneService) -> 
 
     firstPerson = 
 
@@ -90,9 +63,70 @@ FirstPersonService = ($log, sceneService, controlService) ->
             far    = parseInt attrs.farClip     || 100000
 
             firstPerson.camera = new THREE[type] fov, aspect, near, far
-
             firstPerson.clock = new THREE.Clock()
 
+
+ControlService = ($log, firstPersonService) -> 
+
+    service = 
+
+        #
+        # default multiplier: pointer move of pixel rotates camera 1 degree
+        # 
+
+        rotationMultiplier: 1 / Math.PI / 180
+
+        init: (elem, attrs) -> 
+
+            document.addEventListener('mousemove', service.onMouseMove, false);
+            document.addEventListener('keydown', service.onKeyDown, false);
+            document.addEventListener('keyup', service.onKeyUp, false);
+
+            #
+            # scale the multiplier with sensitivity
+            #
+
+            mouseSensitivity = attrs.mouseSensitivity || 1
+            service.rotationMultiplier *= mouseSensitivity;
+
+
+        onMouseMove: (event) -> 
+
+            return unless pointerLocked
+            dx = event.movementX || event.mozMovementX || event.webkitMovementX || 0
+            dy = event.movementY || event.mozMovementY || event.webkitMovementY || 0
+
+
+            firstPersonService.camera.rotation.y += -dx * service.rotationMultiplier
+
+
+            #
+            # TODO: 
+            # 
+            # - maintain up vector 
+            # - maintain lookat vector
+            # - changes in pointerX: 
+            #      -- rotate modelview about the up vector
+            #      -- update the lookat vector
+            # - changes in pointerY:
+            #      -- rotate modelview about the vector product 
+            #         of the lookat and up vectors
+            #      -- update the lookat and up vectors
+            #
+            # - allow locking the up vector to the '''current''' zenith 
+            #   to enable a self correcting spherical traversal of the
+            #   surface
+            # 
+            
+        onKeyDown: (event) ->
+
+            return unless pointerLocked
+            console.log 'press', event.keyCode
+
+        onKeyUp: (event) ->
+
+            return unless pointerLocked
+            console.log 'release', event.keyCode
 
 
 AnimateService = ($log, sceneService, firstPersonService) -> 
@@ -150,9 +184,9 @@ ng.directive 'threeFirstPerson', ($log, firstPersonService, topologyService) ->
         vertex = topologyService.transform firstPersonService.longitude, 
             firstPersonService.latitude, firstPersonService.altitude
 
-        firstPersonService.camera.position.x = vertex.x
-        firstPersonService.camera.position.y = vertex.y
-        firstPersonService.camera.position.z = vertex.z
+        # firstPersonService.camera.position.x = vertex.x
+        # firstPersonService.camera.position.y = vertex.y
+        # firstPersonService.camera.position.z = vertex.z
 
 
 

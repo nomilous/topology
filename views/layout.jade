@@ -7,10 +7,24 @@ html(ng-app='client')
         script(src = '/three-r57/three.js')
         script(src = '/three-r57/first-person-controls.js')
         script(src = '/socket.io/socket.io.js')
+        script(src = '/pointer_lock.js')
 
         != js('manifest')
         != css('style')
 
     body
+
+        div#instructions
+            span(style='font-size:12px')
+                |W, A, S, D -- to move
+                br
+                |MOUSE -- to look around
+            br
+            br
+            span(style='font-size:20px')|click
+
+        script
+            pointerLock('instructions');
+
 
         block content

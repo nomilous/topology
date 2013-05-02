@@ -2,7 +2,7 @@ ng = angular.module 'topology', ['socket']
 
 TopologyService = ($log, socketService) -> 
     
-    radius = 500
+    radius = 1000
     #radius = 6371000  # earth radius in meters (approx)
     radianRatio = Math.PI / 180
 

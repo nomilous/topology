@@ -18,7 +18,7 @@ SceneService = ($log) ->
             scene.renderer = new THREE[type]()
             scene.renderer.setSize elem[0].clientWidth, elem[0].clientHeight
 
-            scene.scene.fog = new THREE.FogExp2 0x202020, 0.0025
+            scene.scene.fog = new THREE.FogExp2 0x251d15, 0.0015
 
             elem[0].appendChild scene.renderer.domElement
 
@@ -45,8 +45,35 @@ ActorService = ($log, sceneService) ->
 
             return actors[id]
 
+ControlService = ($log) -> 
 
-FirstPersonService = ($log, sceneService) -> 
+    service = 
+
+        init: (elem, attrs) -> 
+
+            document.addEventListener('mousemove', service.onMouseMove, false);
+            document.addEventListener('keydown', service.onKeyDown, false);
+            document.addEventListener('keyup', service.onKeyUp, false);
+
+        onMouseMove: (event) -> 
+
+            return unless pointerLocked
+            dx = event.movementX || event.mozMovementX || event.webkitMovementX || 0
+            dy = event.movementY || event.mozMovementY || event.webkitMovementY || 0
+            console.log dx, dy
+            
+        onKeyDown: (event) ->
+
+            return unless pointerLocked
+            console.log 'press', event.keyCode
+
+        onKeyUp: (event) ->
+
+            return unless pointerLocked
+            console.log 'release', event.keyCode
+
+
+FirstPersonService = ($log, sceneService, controlService) -> 
 
     firstPerson = 
 
@@ -63,24 +90,6 @@ FirstPersonService = ($log, sceneService) ->
             far    = parseInt attrs.farClip     || 100000
 
             firstPerson.camera = new THREE[type] fov, aspect, near, far
-
-            #
-            # camera orientation defaults to looking into +x 
-            #
-
-            #firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera, elem[0] );
-            firstPerson.controls = new THREE.FirstPersonControls( firstPerson.camera );
-
-            #
-            # TODO: followinf configurables as attrs in the <three-viewport> directive
-            #
-
-            firstPerson.controls.movementSpeed = 100;
-            firstPerson.controls.lookSpeed = 0.125;
-            firstPerson.controls.lookVertical = true;
-            firstPerson.controls.constrainVertical = false;
-            firstPerson.controls.verticalMin = 1.1;
-            firstPerson.controls.verticalMax = 2.2;
 
             firstPerson.clock = new THREE.Clock()
 
@@ -112,7 +121,7 @@ AnimateService = ($log, sceneService, firstPersonService) ->
 
                 callback()
 
-            firstPersonService.controls.update firstPersonService.clock.getDelta()
+            #firstPersonService.controls.update firstPersonService.clock.getDelta()
             requestAnimationFrame animate.loop
             sceneService.renderer.render sceneService.scene, firstPersonService.camera
 
@@ -124,6 +133,7 @@ AnimateService = ($log, sceneService, firstPersonService) ->
 ng.factory 'sceneService',       SceneService
 ng.factory 'actorService',       ActorService
 ng.factory 'firstPersonService', FirstPersonService
+ng.factory 'controlService',     ControlService
 ng.factory 'animateService',     AnimateService
 
 
@@ -146,7 +156,7 @@ ng.directive 'threeFirstPerson', ($log, firstPersonService, topologyService) ->
 
 
 
-ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonService, animateService) -> 
+ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonService, controlService, animateService) -> 
 
     restrict: 'E'
 
@@ -155,6 +165,7 @@ ng.directive 'threeViewport', ($log, sceneService, actorService, firstPersonServ
         sceneService.init elem, attrs
         actorService.init elem, attrs
         firstPersonService.init elem, attrs
+        controlService.init elem, attrs
         animateService.init elem, attrs
 
         animateService.loop()

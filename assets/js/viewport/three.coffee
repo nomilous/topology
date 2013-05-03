@@ -86,7 +86,7 @@ ControlService = ($log, firstPersonService, animateService) ->
         yawMatrix: new THREE.Matrix4
         pitchMatrix: new THREE.Matrix4
         pitchAxis: new THREE.Vector3
-        velocity: 
+        motion: 
             speed: 10
             straightward: 0
             sideward: 0
@@ -103,6 +103,10 @@ ControlService = ($log, firstPersonService, animateService) ->
 
             mouseSensitivity = attrs.mouseSensitivity || 1
             service.rotationMultiplier *= mouseSensitivity;
+            if attrs.mouseUpLock
+                service.mouseUpLock == 'true'
+            else
+                service.mouseUpLock = true
             service.orient 0, 0
 
 
@@ -123,7 +127,26 @@ ControlService = ($log, firstPersonService, animateService) ->
             # 
 
 
-        orient: (yawRadians, pitchRadians) -> 
+        orient: (yawRadians, pitchRadians) ->
+
+            if service.mouseUpLock
+                
+                #
+                # prevent lookAt vector from approaching zenith/nadir
+                #
+                #     the length of the cross product of two 
+                #     vectors approaches zero the nearer they
+                #     are to parallel 
+                #      
+                #     used here to lessen the inbound pitch delta
+                #     
+                #     it does tend to cause a 'stickyness' at the 
+                #     extreems
+                # 
+
+                length = service.lookVector.clone().cross(service.upVector).length()
+                pitchRadians *= length if length < 0.2
+ 
 
             #
             # yaw: rotate the lookVector about the upVector
@@ -145,18 +168,18 @@ ControlService = ($log, firstPersonService, animateService) ->
                 pitchRadians
             )
             service.lookVector.applyMatrix4 service.pitchMatrix
-            ###### TEMPORARY LOCK UP VECTOR 
-            ###### DOES NOT GRACEFULLY FLIP THROUGH ZENITH 
-            #
-            # service.upVector.applyMatrix4 service.pitchMatrix
 
-            #
-            # apply updated look and upVectors
-            #
+            unless service.mouseUpLock
 
-            firstPersonService.camera.up.x = service.upVector.x
-            firstPersonService.camera.up.y = service.upVector.y
-            firstPersonService.camera.up.z = service.upVector.z
+                #
+                # apply updated look and upVectors
+                #
+
+                service.upVector.applyMatrix4 service.pitchMatrix
+
+                firstPersonService.camera.up.x = service.upVector.x
+                firstPersonService.camera.up.y = service.upVector.y
+                firstPersonService.camera.up.z = service.upVector.z
 
             #1
             # 
@@ -170,19 +193,20 @@ ControlService = ($log, firstPersonService, animateService) ->
             lookAt.add firstPersonService.camera.position
             firstPersonService.camera.lookAt lookAt
 
+
         isStationary: -> 
 
-            return service.velocity.straightward == 0 and service.velocity.sideward == 0
+            return service.motion.straightward == 0 and service.motion.sideward == 0
 
         move: ->
 
             return if service.isStationary()
 
             forward = service.lookVector.clone()
-            forward.multiplyScalar service.velocity.straightward
+            forward.multiplyScalar service.motion.straightward
 
             sideward = service.pitchAxis.clone()
-            sideward.multiplyScalar service.velocity.sideward
+            sideward.multiplyScalar service.motion.sideward
 
             firstPersonService.camera.position.x += forward.x + sideward.x
             firstPersonService.camera.position.y += forward.y + sideward.y
@@ -204,13 +228,13 @@ ControlService = ($log, firstPersonService, animateService) ->
             # console.log 'press', event.keyCode
             switch event.keyCode
                 when 87, 38 # w, uparrow
-                    service.velocity.straightward = service.velocity.speed
+                    service.motion.straightward = service.motion.speed
                 when 83, 40 # s, downarrow
-                    service.velocity.straightward = -service.velocity.speed
+                    service.motion.straightward = -service.motion.speed
                 when 65, 37 # a, leftarrow
-                    service.velocity.sideward = service.velocity.speed
+                    service.motion.sideward = service.motion.speed
                 when 68, 39 # d, rightarrow
-                    service.velocity.sideward = -service.velocity.speed
+                    service.motion.sideward = -service.motion.speed
 
         onKeyUp: (event) ->
 
@@ -218,13 +242,13 @@ ControlService = ($log, firstPersonService, animateService) ->
             #console.log 'release', event.keyCode
             switch event.keyCode
                 when 87, 38
-                    service.velocity.straightward = 0
+                    service.motion.straightward = 0
                 when 83, 40 
-                    service.velocity.straightward = 0
+                    service.motion.straightward = 0
                 when 65, 37 # a, leftarrow
-                    service.velocity.sideward = 0
+                    service.motion.sideward = 0
                 when 68, 39 # d, rightarrow
-                    service.velocity.sideward = 0
+                    service.motion.sideward = 0
 
 
 AnimateService = ($log, sceneService, firstPersonService) -> 

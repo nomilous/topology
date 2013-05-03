@@ -76,6 +76,10 @@ ControlService = ($log, firstPersonService) ->
 
         rotationMultiplier: 1 / Math.PI / 180
 
+        upVector: new THREE.Vector3 0, 1, 0
+        lookVector: new THREE.Vector3 0, 0, -1
+        yawMatrix: new THREE.Matrix4
+
         init: (elem, attrs) -> 
 
             document.addEventListener('mousemove', service.onMouseMove, false);
@@ -88,6 +92,27 @@ ControlService = ($log, firstPersonService) ->
 
             mouseSensitivity = attrs.mouseSensitivity || 1
             service.rotationMultiplier *= mouseSensitivity;
+            service.orient 0, 0
+
+
+        orient: (yawRadians, pitchRadians) -> 
+
+            #
+            # yaw: rotate the lookVector about the upVector
+            #
+
+            service.yawMatrix.makeRotationAxis service.upVector.normalize(), -yawRadians
+            service.lookVector.applyMatrix4 service.yawMatrix
+
+
+            #
+            # apply updated look and upVectors
+            #
+
+            firstPersonService.camera.up.x = service.upVector.x
+            firstPersonService.camera.up.y = service.upVector.y
+            firstPersonService.camera.up.z = service.upVector.z
+            firstPersonService.camera.lookAt service.lookVector
 
 
         onMouseMove: (event) -> 
@@ -96,20 +121,18 @@ ControlService = ($log, firstPersonService) ->
             dx = event.movementX || event.mozMovementX || event.webkitMovementX || 0
             dy = event.movementY || event.mozMovementY || event.webkitMovementY || 0
 
+            pitchRadians = dy * service.rotationMultiplier
+            yawRadians   = dx * service.rotationMultiplier
 
-            firstPersonService.camera.rotation.y += -dx * service.rotationMultiplier
-
+            service.orient yawRadians, pitchRadians
+        
 
             #
             # TODO: 
             # 
             # - maintain up vector 
-            # - maintain lookat vector
-            # - changes in pointerX: 
-            #      -- rotate modelview about the up vector
-            #      -- update the lookat vector
             # - changes in pointerY:
-            #      -- rotate modelview about the vector product 
+            #      -- rotate modelview about the cross product 
             #         of the lookat and up vectors
             #      -- update the lookat and up vectors
             #

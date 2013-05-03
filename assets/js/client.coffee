@@ -113,7 +113,7 @@ ClientController = ($log, actorService, socketService, topologyService, shapeSer
             
             actorService.add
 
-                _id: 'ne_110m_land:' + i
+                _id: 'ne_50m_land:' + i
                 object: line
 
         return

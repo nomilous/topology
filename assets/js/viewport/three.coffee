@@ -71,7 +71,7 @@ ControlService = ($log, firstPersonService, animateService) ->
 
     #
     # TODO: fix mouse rotation (jitter when move/keypresses are active) 
-    #
+    #       probably caused by the lookat position being actual place... #1
 
     service = 
 
@@ -87,7 +87,7 @@ ControlService = ($log, firstPersonService, animateService) ->
         pitchMatrix: new THREE.Matrix4
         pitchAxis: new THREE.Vector3
         velocity: 
-            speed: 1
+            speed: 10
             straightward: 0
             sideward: 0
 
@@ -145,7 +145,10 @@ ControlService = ($log, firstPersonService, animateService) ->
                 pitchRadians
             )
             service.lookVector.applyMatrix4 service.pitchMatrix
-            service.upVector.applyMatrix4 service.pitchMatrix
+            ###### TEMPORARY LOCK UP VECTOR 
+            ###### DOES NOT GRACEFULLY FLIP THROUGH ZENITH 
+            #
+            # service.upVector.applyMatrix4 service.pitchMatrix
 
             #
             # apply updated look and upVectors
@@ -155,7 +158,8 @@ ControlService = ($log, firstPersonService, animateService) ->
             firstPersonService.camera.up.y = service.upVector.y
             firstPersonService.camera.up.z = service.upVector.z
 
-            #
+            #1
+            # 
             # (had me flummoxed) seems that 3's lookAt is literally 
             # a place and not a normalized direction vector, so this 
             # adds lookAt direction vector to position and uses that 

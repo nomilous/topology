@@ -66,7 +66,12 @@ FirstPersonService = ($log, sceneService) ->
             firstPerson.clock = new THREE.Clock()
 
 
-ControlService = ($log, firstPersonService) -> 
+ControlService = ($log, firstPersonService, animateService) -> 
+
+
+    #
+    # TODO: fix mouse rotation (jitter when move/keypresses are active) 
+    #
 
     service = 
 
@@ -81,11 +86,10 @@ ControlService = ($log, firstPersonService) ->
         yawMatrix: new THREE.Matrix4
         pitchMatrix: new THREE.Matrix4
         pitchAxis: new THREE.Vector3
-        motion: new THREE.Vector3 0, 0, 0
         velocity: 
-            speed: 10
+            speed: 1
             straightward: 0
-            sideward: 0 
+            sideward: 0
 
         init: (elem, attrs) -> 
 
@@ -100,6 +104,11 @@ ControlService = ($log, firstPersonService) ->
             mouseSensitivity = attrs.mouseSensitivity || 1
             service.rotationMultiplier *= mouseSensitivity;
             service.orient 0, 0
+
+
+            animateService.on 'before:animate', -> 
+                
+                service.move()
 
 
             #
@@ -157,18 +166,23 @@ ControlService = ($log, firstPersonService) ->
             lookAt.add firstPersonService.camera.position
             firstPersonService.camera.lookAt lookAt
 
+        isStationary: -> 
+
+            return service.velocity.straightward == 0 and service.velocity.sideward == 0
+
         move: ->
 
-            #
-            # forward motion along lookAt vector
-            # 
+            return if service.isStationary()
 
-            service.motion.copy service.lookVector
-            service.motion.multiplyScalar service.velocity.straightward
+            forward = service.lookVector.clone()
+            forward.multiplyScalar service.velocity.straightward
 
-            firstPersonService.camera.position.x += service.motion.x
-            firstPersonService.camera.position.y += service.motion.y
-            firstPersonService.camera.position.z += service.motion.z
+            sideward = service.pitchAxis.clone()
+            sideward.multiplyScalar service.velocity.sideward
+
+            firstPersonService.camera.position.x += forward.x + sideward.x
+            firstPersonService.camera.position.y += forward.y + sideward.y
+            firstPersonService.camera.position.z += forward.z + sideward.z
 
 
         onMouseMove: (event) -> 
@@ -183,29 +197,30 @@ ControlService = ($log, firstPersonService) ->
         onKeyDown: (event) ->
 
             return unless pointerLocked
-            console.log 'press', event.keyCode
-
+            # console.log 'press', event.keyCode
             switch event.keyCode
-                when 87 
+                when 87, 38 # w, uparrow
                     service.velocity.straightward = service.velocity.speed
-                when 83 
+                when 83, 40 # s, downarrow
                     service.velocity.straightward = -service.velocity.speed
-
-
-            service.move()
+                when 65, 37 # a, leftarrow
+                    service.velocity.sideward = service.velocity.speed
+                when 68, 39 # d, rightarrow
+                    service.velocity.sideward = -service.velocity.speed
 
         onKeyUp: (event) ->
 
             return unless pointerLocked
-            console.log 'release', event.keyCode
-
+            #console.log 'release', event.keyCode
             switch event.keyCode
-                when 87 
+                when 87, 38
                     service.velocity.straightward = 0
-                when 83 
+                when 83, 40 
                     service.velocity.straightward = 0
-
-            service.move()
+                when 65, 37 # a, leftarrow
+                    service.velocity.sideward = 0
+                when 68, 39 # d, rightarrow
+                    service.velocity.sideward = 0
 
 
 AnimateService = ($log, sceneService, firstPersonService) -> 

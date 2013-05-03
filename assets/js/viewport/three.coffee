@@ -81,6 +81,11 @@ ControlService = ($log, firstPersonService) ->
         yawMatrix: new THREE.Matrix4
         pitchMatrix: new THREE.Matrix4
         pitchAxis: new THREE.Vector3
+        motion: new THREE.Vector3 0, 0, 0
+        velocity: 
+            speed: 10
+            straightward: 0
+            sideward: 0 
 
         init: (elem, attrs) -> 
 
@@ -140,7 +145,30 @@ ControlService = ($log, firstPersonService) ->
             firstPersonService.camera.up.x = service.upVector.x
             firstPersonService.camera.up.y = service.upVector.y
             firstPersonService.camera.up.z = service.upVector.z
-            firstPersonService.camera.lookAt service.lookVector
+
+            #
+            # (had me flummoxed) seems that 3's lookAt is literally 
+            # a place and not a normalized direction vector, so this 
+            # adds lookAt direction vector to position and uses that 
+            # to update camera.lookat
+            # 
+
+            lookAt = service.lookVector.clone()
+            lookAt.add firstPersonService.camera.position
+            firstPersonService.camera.lookAt lookAt
+
+        move: ->
+
+            #
+            # forward motion along lookAt vector
+            # 
+
+            service.motion.copy service.lookVector
+            service.motion.multiplyScalar service.velocity.straightward
+
+            firstPersonService.camera.position.x += service.motion.x
+            firstPersonService.camera.position.y += service.motion.y
+            firstPersonService.camera.position.z += service.motion.z
 
 
         onMouseMove: (event) -> 
@@ -148,10 +176,8 @@ ControlService = ($log, firstPersonService) ->
             return unless pointerLocked
             dx = event.movementX || event.mozMovementX || event.webkitMovementX || 0
             dy = event.movementY || event.mozMovementY || event.webkitMovementY || 0
-
             pitchRadians = dy * service.rotationMultiplier
             yawRadians   = dx * service.rotationMultiplier
-
             service.orient yawRadians, pitchRadians
             
         onKeyDown: (event) ->
@@ -159,10 +185,27 @@ ControlService = ($log, firstPersonService) ->
             return unless pointerLocked
             console.log 'press', event.keyCode
 
+            switch event.keyCode
+                when 87 
+                    service.velocity.straightward = service.velocity.speed
+                when 83 
+                    service.velocity.straightward = -service.velocity.speed
+
+
+            service.move()
+
         onKeyUp: (event) ->
 
             return unless pointerLocked
             console.log 'release', event.keyCode
+
+            switch event.keyCode
+                when 87 
+                    service.velocity.straightward = 0
+                when 83 
+                    service.velocity.straightward = 0
+
+            service.move()
 
 
 AnimateService = ($log, sceneService, firstPersonService) -> 

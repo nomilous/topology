@@ -79,6 +79,8 @@ ControlService = ($log, firstPersonService) ->
         upVector: new THREE.Vector3 0, 1, 0
         lookVector: new THREE.Vector3 0, 0, -1
         yawMatrix: new THREE.Matrix4
+        pitchMatrix: new THREE.Matrix4
+        pitchAxis: new THREE.Vector3
 
         init: (elem, attrs) -> 
 
@@ -95,6 +97,18 @@ ControlService = ($log, firstPersonService) ->
             service.orient 0, 0
 
 
+            #
+            # TODO: 
+            #
+            # - allow locking the up vector 
+            # 
+            #   -- to the +y (for normal mouselook behaviour)
+            # 
+            #   -- to the '''current''' zenith to enable a self 
+            #      correcting spherical traversal of the surface
+            # 
+
+
         orient: (yawRadians, pitchRadians) -> 
 
             #
@@ -104,6 +118,20 @@ ControlService = ($log, firstPersonService) ->
             service.yawMatrix.makeRotationAxis service.upVector.normalize(), -yawRadians
             service.lookVector.applyMatrix4 service.yawMatrix
 
+            #
+            # pitch: rotate lookVector and upVector about their 
+            # cross product (ie. the vector perpendicular to them both)
+            #
+
+            service.pitchMatrix.makeRotationAxis(
+                service.pitchAxis.crossVectors(
+                    service.upVector, 
+                    service.lookVector
+                ).normalize(),
+                pitchRadians
+            )
+            service.lookVector.applyMatrix4 service.pitchMatrix
+            service.upVector.applyMatrix4 service.pitchMatrix
 
             #
             # apply updated look and upVectors
@@ -125,21 +153,6 @@ ControlService = ($log, firstPersonService) ->
             yawRadians   = dx * service.rotationMultiplier
 
             service.orient yawRadians, pitchRadians
-        
-
-            #
-            # TODO: 
-            # 
-            # - maintain up vector 
-            # - changes in pointerY:
-            #      -- rotate modelview about the cross product 
-            #         of the lookat and up vectors
-            #      -- update the lookat and up vectors
-            #
-            # - allow locking the up vector to the '''current''' zenith 
-            #   to enable a self correcting spherical traversal of the
-            #   surface
-            # 
             
         onKeyDown: (event) ->
 
